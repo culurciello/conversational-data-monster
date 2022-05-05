@@ -2,6 +2,8 @@
 
 converse with your data
 
+![demo_video](static/demo/conversational_data_monster.gif)
+
 <!--## Installation
 
 Requirements:
