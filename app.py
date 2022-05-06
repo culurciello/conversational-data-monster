@@ -25,17 +25,17 @@ with open(dataset_file, 'r') as infile:
   dataset = list(reader)
 
 
-def plot(a, b):
+def plot(a, b, limit=10, figsize=(8, 6), dpi=120):
     # find match in a:
     ai = [i for i, s in enumerate(dataset[0]) if a.lower() in s.lower()]
     # find match in b:
     bi = [i for i, s in enumerate(dataset[0]) if b.lower() in s.lower()]
     data = np.array(dataset)
     # Generate the figure **without using pyplot**.
-    fig = Figure(figsize=(8, 6), dpi=120)
+    fig = Figure(figsize=figsize, dpi=dpi)
     ax = fig.subplots()
     # ax.plot(dataset[0], dataset[1])
-    ax.plot(data[1:10, ai[0]], data[1:10, bi[0]])
+    ax.plot(data[1:limit, ai[0]], data[1:limit, bi[0]])
     # Save it to a temporary buffer.
     buf = BytesIO()
     fig.savefig(buf, format="png")
@@ -61,18 +61,22 @@ def plot(a, b):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     errors = []
-    data = None
-    data_image = None
+
     if request.method == "POST":
         # get user command
         try:
             command = request.form['textInput']
+            app.dialogue_usr.append(command)
             print('User input:', command)
         except:
             errors.append(
                 "Not a valid command!"
             )
-            return render_template('index.html', errors=errors, data=None, data_image=None)
+            return render_template('index.html', 
+                errors=errors, 
+                data=None, 
+                data_image=None, 
+                dialogue_usr=None)
         if command:
             # text processing
             response = parse_command(command)
@@ -81,10 +85,14 @@ def index():
             try:
                 r = response['action']
                 if r == 'load':
-                    data = dataset
+                    app.data = dataset
                 elif r == 'plot':
                     if response['objects'][0] and response['objects'][1]:
-                        data_image = plot(response['objects'][0], response['objects'][1])
+                        app.data_image = plot(response['objects'][0], response['objects'][1])
+                elif r == 'clear':
+                    app.data = None
+                    app.data_image = None
+                    app.dialogue_usr = []
                 else:
                     None
             except:
@@ -93,8 +101,16 @@ def index():
             )
 
 
-    return render_template('index.html', errors=errors, data=data, data_image=data_image)
+    return render_template('index.html', 
+        errors=errors, 
+        data=app.data, 
+        data_image=app.data_image, 
+        dialogue_usr=app.dialogue_usr)
 
 
 if __name__ == '__main__':
+    app.data = None
+    app.data_image = None
+    app.dialogue_usr = []
+    
     app.run()

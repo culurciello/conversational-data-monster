@@ -26,7 +26,8 @@ ATTRIBUTES = [
 IGNORE = ['a', 'the', 'of', 'to', 'from']
 
 COMMANDS_FIXED = {
-    'load data'     :{"action":"load", "objects":["data"], "attributes":[], "msg":"loaded data!"}, # load test dataset 
+    'load data'  :{"action":"load", "objects":["data"], "attributes":[], "msg":"loaded data!"}, # load test dataset
+    'clear'      :{"action":"clear"}, # clear all app data
 }
 
 def parse_command(command):

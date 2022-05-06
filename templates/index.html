@@ -12,39 +12,26 @@
     
     <!-- https://stackoverflow.com/questions/11701311/logo-image-and-h1-heading-on-the-same-line -->
     <div class="jumbotron">
-      <img src="/static/assets/logo/logo.png" alt="logo" width="150">
-      <h1>Conversational data monster</h1>
+
+
+      <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h1>Conversational data monster</h1>
+                <h2>Dialogue with your data</h2>
+            </div>
+            <div class="col-md-2">
+                <img src="/static/assets/logo/logo.png" alt="logo" width="150">
+            </div>
+        </div>
+      </div>
     </div>
+
 
     <div class="container">
       <div class="row">
-        <div class="col-med-5 col-sm-offset-1">
-        
-          <br>
-        
-          <form role="form" method="POST" action="/">
-            <div class="form-group">
-              <input type="text" name="textInput" class="form-control" id="url-box" placeholder="Enter Command ... 'load data' or 'plot a vs b' ">
-            </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-          </form>
-        
-          <br>
 
-          {% for error in errors %}
-            <h4>{{ error }}</h4>
-          {% endfor %}
-          
-          <br>
-
-          <div>
-            <img src='data:image/png;base64,{{data_image}}'/>
-          </div>
-
-        
-        </div>
-
-        <div class="col-sm-5 col-sm-offset-1" id="table">
+        <div class="col-md-4" id="table">
           <table>
             <thead>
                 <tr>
@@ -67,10 +54,44 @@
           </table>
         </div>
 
+        {% if data_image %}
+          <div class="col-md-4">
+            <img src='data:image/png;base64,{{data_image}}'/>
+          </div>
+        {% endif %}
+
       </div>
     </div>
 
-    <br><br>
+    <!-- CHAT and input dialog -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+
+          
+        <!-- <div class="col-md-4"> -->
+          {% for value in dialogue_usr %}
+            <p><span class="badge badge-secondary">{{value}}</span></p>
+          {% endfor %}
+        <!-- </div> -->
+  
+          <form role="form" method="POST" action="/">
+            <div class="form-group">
+              <input type="text" name="textInput" class="form-control" id="url-box" placeholder="Enter Command ... 'load data' or 'plot a vs b' ">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+
+          {% for error in errors %}
+            <h4>{{ error }}</h4>
+          {% endfor %}
+        
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
 
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>

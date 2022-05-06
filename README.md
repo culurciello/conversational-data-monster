@@ -25,4 +25,11 @@ python3 app.py
 
 ## Instructions
 
-See docs folder for info.
+Example list of current commands:
+
+- "load data"
+- "plot country vs population"
+- clear
+
+
+Also see docs folder for info.
