@@ -75,12 +75,11 @@ def index():
             return render_template('index.html', 
                 errors=errors, 
                 data=None, 
-                data_image=None, 
+                plot=None, 
                 dialogue_usr=None)
         if command:
             # text processing
             response = parse_command(command)
-            print(response)
 
             try:
                 r = response['action']
@@ -88,11 +87,18 @@ def index():
                     app.data = dataset
                 elif r == 'plot':
                     if response['objects'][0] and response['objects'][1]:
-                        app.data_image = plot(response['objects'][0], response['objects'][1])
+                        app.plot = plot(response['objects'][0], response['objects'][1])
                 elif r == 'clear':
-                    app.data = None
-                    app.data_image = None
-                    app.dialogue_usr = []
+                    print('OBJ:', response['objects'][0])
+                    if response['objects'][0]:
+                        if response['objects'][0] == 'data':
+                            app.data = None
+                        elif response['objects'][0] == 'plot':
+                            app.plot = None
+                    else:
+                        app.data = None
+                        app.plot = None
+                        app.dialogue_usr = []
                 else:
                     None
             except:
@@ -104,13 +110,13 @@ def index():
     return render_template('index.html', 
         errors=errors, 
         data=app.data, 
-        data_image=app.data_image, 
+        plot=app.plot, 
         dialogue_usr=app.dialogue_usr)
 
 
 if __name__ == '__main__':
     app.data = None
-    app.data_image = None
+    app.plot = None
     app.dialogue_usr = []
     
     app.run()
