@@ -83,22 +83,26 @@ def index():
 
             try:
                 r = response['action']
+                
                 if r == 'load':
                     app.data = dataset
+                
                 elif r == 'plot':
                     if response['objects'][0] and response['objects'][1]:
                         app.plot = plot(response['objects'][0], response['objects'][1])
+                
                 elif r == 'clear':
-                    print('OBJ:', response['objects'][0])
-                    if response['objects'][0]:
-                        if response['objects'][0] == 'data':
-                            app.data = None
-                        elif response['objects'][0] == 'plot':
-                            app.plot = None
+                    if response['objects']:
+                        if response['objects'][0]:
+                            if response['objects'][0] == 'data':
+                                app.data = None
+                            elif response['objects'][0] == 'plot':
+                                app.plot = None
                     else:
                         app.data = None
                         app.plot = None
                         app.dialogue_usr = []
+                
                 else:
                     None
             except:

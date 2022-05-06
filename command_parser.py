@@ -43,7 +43,8 @@ def parse_command(command):
         return COMMANDS_FIXED[command]
 
     # evaluate some cases of complex commands:
-    elif len(split)>1 and split[0] == 'plot':
+    else:
+        if len(split)>=3 and split[0] == 'plot':
             obj1 = split[1]
             # split[2] is 'vs' or 'versus'
             obj2 = split[3]
