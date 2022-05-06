@@ -33,3 +33,12 @@ Example list of current commands:
 
 
 Also see docs folder for info.
+
+
+## better command parsing
+
+There are multiple ways to write a command. For better command parsing and recognition (rather than fixed typing rules) one can use sentence transformers.
+
+Using RoBERTa sentence embedding can be tested here:
+
+`python3 text_similarity.py `
