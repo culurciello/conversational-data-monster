@@ -11,6 +11,7 @@
 # TEST with: # $ python3 command_parser.py 'plot country vs population'
 
 import sys
+from text_similarity import match_text # used to match language propmpts to commands
 
 # command actions:
 ACTIONS = [
@@ -31,6 +32,10 @@ COMMANDS_FIXED = {
     'clear plot' :{"action":"clear", "objects":["plot"],}, # clear all app data
     'clear data' :{"action":"clear", "objects":["data"],}, # clear all app data
 }
+
+# all complex langiage commands:
+COMMANDS_COMPLEX = {}
+
 
 def parse_command(command):
     parsed_command = {"action":[], "objects":[], "attributes":[], "msg":""}
