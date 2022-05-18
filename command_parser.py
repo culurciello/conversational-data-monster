@@ -11,7 +11,7 @@
 # TEST with: # $ python3 command_parser.py 'plot country vs population'
 
 import sys
-from text_similarity import match_text # used to match language propmpts to commands
+# from text_similarity import match_text # used to match language propmpts to commands
 
 # command actions:
 ACTIONS = [
