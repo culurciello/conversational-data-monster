@@ -9,7 +9,6 @@ import base64
 from io import BytesIO
 from flask import Flask, jsonify, request, render_template, send_file
 from matplotlib.figure import Figure
-# import matplotlib.pyplot as plt
 import numpy as np
 
 # command parser:
@@ -26,6 +25,7 @@ with open(dataset_file, 'r') as infile:
 
 
 def plot(a, b, limit=10, figsize=(8, 6), dpi=120):
+    # plot a versus b - finding ab,b in dataset
     # find match in a:
     ai = [i for i, s in enumerate(dataset[0]) if a.lower() in s.lower()]
     # find match in b:
@@ -36,6 +36,8 @@ def plot(a, b, limit=10, figsize=(8, 6), dpi=120):
     ax = fig.subplots()
     # ax.plot(dataset[0], dataset[1])
     ax.plot(data[1:limit, ai[0]], data[1:limit, bi[0]])
+    # save plot
+    # fig.savefig("test_figs.png", format="png") # uncomment this to save png file
     # Save it to a temporary buffer.
     buf = BytesIO()
     fig.savefig(buf, format="png")
@@ -43,19 +45,6 @@ def plot(a, b, limit=10, figsize=(8, 6), dpi=120):
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
     # return f"<img src='data:image/png;base64,{data}'/>"
     return data
-
-
-# def plottest(a, b):
-#     # find match in a:
-#     ai = [i for i, s in enumerate(dataset[0]) if a.lower() in s.lower()]
-#     # find match in b:
-#     bi = [i for i, s in enumerate(dataset[0]) if b.lower() in s.lower()]
-#     data = np.array(dataset)
-#     plt.plot(data[1:10, ai[0]], data[1:10, bi[0]])
-#     plt.show()
-
-# print(dataset[0:3])
-# plottest('country', 'population')
 
 
 @app.route('/', methods=['GET', 'POST'])
