@@ -1,21 +1,23 @@
 # conversational data monster
-# web app with gradio
+# web app
 
-# import time
-# import os
-# import json
+import time
+import os
+import json
 import csv
-
-import gradio as gr
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+from flask import Flask, jsonify, request, render_template, send_file
+from matplotlib.figure import Figure
+# import matplotlib.pyplot as plt
 import numpy as np
 
 # command parser:
 from command_parser import parse_command
 
+
+app = Flask(__name__)
+app.debug = True
 
 dataset_file = 'datasets/population_by_country_2020.csv'
 with open(dataset_file, 'r') as infile:
@@ -23,75 +25,102 @@ with open(dataset_file, 'r') as infile:
   dataset = list(reader)
 
 
-def plot(a, b, limit=10, figsize=(8, 6), dpi=120, command=""):
+def plot(a, b, limit=10, figsize=(8, 6), dpi=120):
     # find match in a:
     ai = [i for i, s in enumerate(dataset[0]) if a.lower() in s.lower()]
     # find match in b:
     bi = [i for i, s in enumerate(dataset[0]) if b.lower() in s.lower()]
     data = np.array(dataset)
-    plt.plot(data[1:limit, ai[0]], data[1:limit, bi[0]])
-    plt.title(command)
-    return plt.gcf()
+    # Generate the figure **without using pyplot**.
+    fig = Figure(figsize=figsize, dpi=dpi)
+    ax = fig.subplots()
+    # ax.plot(dataset[0], dataset[1])
+    ax.plot(data[1:limit, ai[0]], data[1:limit, bi[0]])
+    # Save it to a temporary buffer.
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    # Embed the result in the html output.
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    # return f"<img src='data:image/png;base64,{data}'/>"
+    return data
 
 
-def dialogue(command, history):
-    history = history or []
-    # get user command
-    print('User input:', command)
-    if command:
-        # text processing
-        response = parse_command(command)
+# def plottest(a, b):
+#     # find match in a:
+#     ai = [i for i, s in enumerate(dataset[0]) if a.lower() in s.lower()]
+#     # find match in b:
+#     bi = [i for i, s in enumerate(dataset[0]) if b.lower() in s.lower()]
+#     data = np.array(dataset)
+#     plt.plot(data[1:10, ai[0]], data[1:10, bi[0]])
+#     plt.show()
 
+# print(dataset[0:3])
+# plottest('country', 'population')
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    errors = []
+
+    if request.method == "POST":
+        # get user command
         try:
-            r = response['action']
-            
-            if r == 'load':
-                demo.data = dataset[0:3]
-                reply = "Ok"
-            
-            elif r == 'plot':
-                if response['objects'][0] and response['objects'][1]:
-                    demo.plot = plot(response['objects'][0], response['objects'][1], command=command)
-                    reply = "Ok"
-            
-            elif r == 'clear':
-                if response['objects']:
-                    if response['objects'][0]:
-                        if response['objects'][0] == 'data':
-                            demo.data = None
-                        elif response['objects'][0] == 'plot':
-                            demo.plot = None
-                else:
-                    demo.data = None
-                    demo.plot = None
-
-                reply = "Ok"
-            
-            else:
-                None
-                reply = "Not sure here..."
+            command = request.form['textInput']
+            app.dialogue_usr.append(command)
+            print('User input:', command)
         except:
-            print("Not a valid command!")
+            errors.append(
+                "Not a valid command!"
+            )
+            return render_template('index.html', 
+                errors=errors, 
+                data=None, 
+                plot=None, 
+                dialogue_usr=None)
+        if command:
+            # text processing
+            response = parse_command(command)
 
-    history.append((command, reply))
-    return history, history, demo.data, demo.plot
+            try:
+                r = response['action']
+                
+                if r == 'load':
+                    app.data = dataset
+                
+                elif r == 'plot':
+                    if response['objects'][0] and response['objects'][1]:
+                        app.plot = plot(response['objects'][0], response['objects'][1])
+                
+                elif r == 'clear':
+                    if response['objects']:
+                        if response['objects'][0]:
+                            if response['objects'][0] == 'data':
+                                app.data = None
+                            elif response['objects'][0] == 'plot':
+                                app.plot = None
+                    else:
+                        app.data = None
+                        app.plot = None
+                        app.dialogue_usr = []
+                
+                else:
+                    None
+            except:
+                errors.append(
+                "Not a valid command!"
+            )
 
-chatbot = gr.Chatbot(color_map=("green", "gray"))
 
-demo = gr.Interface(
-        title="Conversational Data Monster",
-        description="Load data and plot it with natural language commands",
-        fn=dialogue, 
-        inputs=["text", "state"],
-        outputs=[chatbot, "state", "dataframe", "plot"],
-        article="Try by typing: 'load data', 'plot country versus population', etc.",
-    )
+    return render_template('index.html', 
+        errors=errors, 
+        data=app.data, 
+        plot=app.plot, 
+        dialogue_usr=app.dialogue_usr)
 
 
 if __name__ == '__main__':
-    # demo data:
-    demo.data = None
-    demo.plot = None
-    # demo.history = [] # dialogue history
+    app.data = None
+    app.plot = None
+    app.dialogue_usr = []
     
-    demo.launch()
+    app.run()
