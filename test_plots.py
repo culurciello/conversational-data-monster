@@ -19,13 +19,14 @@ def plot(a, b, limit=10, figsize=(8, 6), dpi=120, fontsize=12):
     # find match in b:
     bi = [i for i, s in enumerate(dataset[0]) if b.lower() in s.lower()]
     data = np.array(dataset)
+
     # create figure
     fig = Figure(figsize=figsize, dpi=dpi)
     ax = fig.subplots()
     ax.set_title(a+" vs "+b, fontsize=fontsize)
     ax.set_xlabel(a, fontsize=fontsize)
     ax.set_ylabel(b, fontsize=fontsize)
-    ax.plot(data[1:limit, ai[0]], data[1:limit, bi[0]])
+    ax.plot(data[1:limit, ai[0]], data[1:limit, bi[0]].astype(float))
 
     # save plot to file
     fig.tight_layout()
