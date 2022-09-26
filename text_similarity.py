@@ -33,11 +33,11 @@ def match_text(text_commands, input_command):
         # print(line, input_command)
         s = util.pytorch_cos_sim(embeddings[i], embedinput).item()
         similarity.append(s)
-        print(line, s)
+        # print(line, s)
 
     similarity_sorted = np.sort(similarity)[::-1]
     sorted_idx = np.argsort(similarity)[::-1]
-    print(similarity_sorted, sorted_idx) 
+    # print(similarity_sorted, sorted_idx) 
     
     return similarity_sorted, sorted_idx
 
